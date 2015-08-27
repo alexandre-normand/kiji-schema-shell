@@ -130,6 +130,7 @@ final class DDLParser(val env: Environment)
       i("CLASS")~>repsep(ident, ".") ^^ { parts: List[String] => new ClassSchemaSpec(parts) }
     | jsonValue ^^ { json: String => new JsonSchemaSpec(json) }
     | i("COUNTER") ^^ { _ => new CounterSchemaSpec }
+    | i("RAW") ^^ { _ => new RawSchemaSpec }
     | i("ID")~>longValue ^^ { uid: Long => new UidSchemaSpec(uid) }
     | i("AVRO") ~> avroType(Context()) ^^ { schema: Schema => new InlineSchemaSpec(schema) }
   )
@@ -162,9 +163,9 @@ final class DDLParser(val env: Environment)
   /** Matches one of the bloom filter modes supported by HBase. */
   def bloomFilter: Parser[BloomType] = (
       i("NONE") ^^ (_ => BloomType.NONE)
-    | i("ROW") ^^ (_ => BloomType.ROW)
     | i("ROWCOL") ^^ (_ => BloomType.ROWCOL)
-  )
+    | i("ROW") ^^ (_ => BloomType.ROW)
+    )
 
   /**
    * An optional clause of the form: WITH DESCRIPTION 'd'.

@@ -230,6 +230,7 @@ trait AbstractDumpDDLCommand extends TableProperties {
     schema.getType() match {
       case SchemaType.CLASS => { echo("    WITH SCHEMA CLASS " + schema.getValue().trim) }
       case SchemaType.COUNTER => { echo("    WITH SCHEMA COUNTER") }
+      case SchemaType.RAW_BYTES => { echo("    WITH SCHEMA RAW") }
       case SchemaType.INLINE => { echo(schema.getValue().trim) }
       case SchemaType.AVRO => {
         if (schema.getSpecificReaderSchemaClass() != null) {

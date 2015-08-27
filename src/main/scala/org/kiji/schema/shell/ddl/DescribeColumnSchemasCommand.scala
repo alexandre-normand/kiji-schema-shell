@@ -85,6 +85,7 @@ final class DescribeColumnSchemasCommand(
 
     cellSchema.getType match {
       case SchemaType.COUNTER => { echo("  Schema: (counter)") }
+      case SchemaType.RAW_BYTES => { echo("  Schema: (raw)") }
       case SchemaType.CLASS => { echo("  Schema class: "
           + cellSchema.getValue().toString().trim) }
       case SchemaType.INLINE => {

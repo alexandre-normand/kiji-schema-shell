@@ -194,6 +194,9 @@ final class DescribeTableCommand(
       case SchemaType.COUNTER => {
         padEcho(numTabs, "Schema: (counter)")
       }
+      case SchemaType.RAW_BYTES => {
+        padEcho(numTabs, "Schema: (raw)")
+      }
       case SchemaType.CLASS => {
         padEcho(numTabs, "Schema: " + cellSchema.getValue())
       }

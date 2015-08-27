@@ -174,6 +174,33 @@ class TestTableOperations extends CommandTestCase {
       defaultLocGroup2.getBloomType() mustEqual BloomType.ROW
     }
 
+    "Use the locality group BLOOM FILTER property with ROWCOL" in {
+      val parser = getParser()
+      val res = parser.parseAll(parser.statement, """
+        |CREATE TABLE foo WITH DESCRIPTION 'some data'
+        |ROW KEY FORMAT HASHED
+        |WITH LOCALITY GROUP default WITH DESCRIPTION 'main storage' (
+        |  MAXVERSIONS = INFINITY,
+        |  BLOOM FILTER = ROWCOL,
+        |  FAMILY info WITH DESCRIPTION 'basic information' (
+        |    name "string" WITH DESCRIPTION 'The user\'s name'
+        |  ));""".stripMargin);
+      res.successful mustEqual true
+      res.get must beAnInstanceOf[CreateTableCommand]
+      val env2 = res.get.exec()
+
+      val maybeLayout2 = env.kijiSystem.getTableLayout(
+        defaultURI, "foo")
+      maybeLayout2 must beSome[KijiTableLayout]
+      val layout2 = maybeLayout2.get.getDesc
+      val locGroups2 = layout2.getLocalityGroups()
+      locGroups2.size mustEqual 1
+      val defaultLocGroup2 = locGroups2.head
+      defaultLocGroup2.getName().toString() mustEqual "default"
+      defaultLocGroup2.getFamilies().size mustEqual 1
+      defaultLocGroup2.getBloomType() mustEqual BloomType.ROWCOL
+    }
+
     "Use the locality group BLOCK SIZE property" in {
       val parser = getParser()
       val res = parser.parseAll(parser.statement, """

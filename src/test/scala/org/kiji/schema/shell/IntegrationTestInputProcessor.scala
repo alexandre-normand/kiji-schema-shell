@@ -65,6 +65,21 @@ class IntegrationTestInputProcessor
       |);
     """.stripMargin
 
+  val validRawSchema =
+    """
+      |CREATE TABLE foo WITH DESCRIPTION 'some data'
+      |ROW KEY FORMAT RAW
+      |PROPERTIES ( NUMREGIONS = 1 )
+      |WITH LOCALITY GROUP default WITH DESCRIPTION 'main storage' (
+      |  MAXVERSIONS = INFINITY,
+      |  TTL = FOREVER,
+      |  INMEMORY = false,
+      |  COMPRESSED WITH GZIP,
+      |  FAMILY default WITH DESCRIPTION 'basic information' (
+      |    info RAW WITH DESCRIPTION 'Raw bytes of user info')
+      |);
+    """.stripMargin
+
   def envFromInput(uri: KijiURI, input: String, isInteractive: Boolean): Environment = {
     new Environment(
       instanceURI = uri,
@@ -88,6 +103,15 @@ class IntegrationTestInputProcessor
       val uri2 = getNewInstanceURI()
       installKiji(uri2)
       val env2 = envFromInput(uri2, validExprOnClasspath, false)
+      (inputProcessor.processUserInput(new StringBuilder, env2) must not throwA)
+    }
+
+    "Not error on successful execution with raw schema of a non-interactive command" in {
+      val inputProcessor = new InputProcessor(throwOnErr = true)
+
+      val uri2 = getNewInstanceURI()
+      installKiji(uri2)
+      val env2 = envFromInput(uri2, validRawSchema, false)
       (inputProcessor.processUserInput(new StringBuilder, env2) must not throwA)
     }
 
